@@ -414,7 +414,19 @@ if __name__ == "__main__":
     print("Solver (CPLEX) baslatiliyor...")
     opt = SolverFactory('cplex')
     t6 = time.perf_counter()
-    results = opt.solve(model, tee=True)
+    results = opt.solve(model, tee=True, load_solutions=False)
+
+    status = results.solver.status
+    term   = results.solver.termination_condition
+
+    print("Solver status:", status)
+    print("Termination condition:", term)
+
+if status == SolverStatus.ok and term == TerminationCondition.optimal:
+    model.solutions.load_from(results)
+    print("✅ Optimal solution loaded")
+else:
+    print("❌ No feasible solution")
     t7 = time.perf_counter()
     print(f"[TIMER] solve: {t7 - t6:.2f}s")
 
